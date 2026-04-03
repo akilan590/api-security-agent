@@ -1,22 +1,29 @@
 package com.securityagent.api_security_agent.model;
 
-
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Generated;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
-@Table
+@Table(name = "app_users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(unique = true)
-    private String Username;
+    @Column(name = "id")
+    private Long id;
 
-    private String Password;
+    @Column(name = "username", unique = true)
+    private String username;
 
-    private String Role;
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "role")
+    private String role;
+
 }
