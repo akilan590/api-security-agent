@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" 
+          content="width=device-width, 
+                   initial-scale=1.0">
+    <title>API Security Agent Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>API Security Agent</h1>
+        <p>Real-time threat monitoring dashboard</p>
+        <div class="status">
+            <span class="dot"></span>
+            <span>Live</span>
+        </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h2>Login to Dashboard</h2>
+            <input
+                type="text"
+                id="username"
+                placeholder="Username"
+                value="akilan"/>
+            <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                value="123456"/>
+            <button onclick="login()">
+                Login
+            </button>
+            <p id="loginError" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard (hidden until login) -->
+    <div class="dashboard" 
+         id="dashboard" 
+         style="display:none">
+
+        <!-- Stats Cards -->
+        <div class="cards">
+            <div class="card red">
+                <h3>Total Attacks</h3>
+                <p id="totalAttacks">0</p>
+            </div>
+            <div class="card orange">
+                <h3>SQL Injections</h3>
+                <p id="sqlCount">0</p>
+            </div>
+            <div class="card yellow">
+                <h3>XSS Attacks</h3>
+                <p id="xssCount">0</p>
+            </div>
+            <div class="card blue">
+                <h3>Other Attacks</h3>
+                <p id="otherCount">0</p>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button onclick="loadLogs()">
+                Refresh Logs
+            </button>
+            <button onclick="loadStats()">
+                Refresh Stats
+            </button>
+            <button onclick="logout()">
+                Logout
+            </button>
+            <select id="filterType" 
+                    onchange="filterLogs()">
+                <option value="all">All Attacks</option>
+                <option value="SQL_INJECTION">
+                    SQL Injection
+                </option>
+                <option value="XSS_ATTACK">
+                    XSS Attack
+                </option>
+            </select>
+        </div>
+
+        <!-- Logs Table -->
+        <div class="table-container">
+            <h2>Attack Logs</h2>
+            <table id="logsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>IP Address</th>
+                        <th>Endpoint</th>
+                        <th>Attack Type</th>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="logsBody">
+                </tbody>
+            </table>
+            <p id="noLogs" 
+               style="display:none;
+                      text-align:center;
+                      padding:20px">
+                No attack logs found
+            </p>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

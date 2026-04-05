@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,35 +23,46 @@ public class SecurityConfig {
     private RateLimitFilter rateLimitFilter;
 
     @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private JwtAuthenticationFilter
+            jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http) throws Exception {
         http
+                // disable csrf
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/login",
-                                "/auth/register").permitAll()
-                        .anyRequest().authenticated()
+
+                // disable session
+                // we use JWT not sessions
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS)
                 )
-                // runs in this exact order:
 
-                // 1. RateLimitFilter runs first
-                // blocks IPs sending too many requests
+                // allow all requests
+                // our JWT filter handles auth
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+
+                // disable default login page
+                .formLogin(form -> form.disable())
+
+                // disable basic auth popup
+                .httpBasic(basic -> basic.disable())
+
+                // add our custom filters
                 .addFilterBefore(rateLimitFilter,
-                        UsernamePasswordAuthenticationFilter.class)
-
-                // 2. SecurityFilter runs second
-                // blocks SQL injection and XSS attacks
+                        UsernamePasswordAuthenticationFilter
+                                .class)
                 .addFilterBefore(securityFilter,
-                        UsernamePasswordAuthenticationFilter.class)
-
-                // 3. JwtAuthenticationFilter runs third
-                // checks API key and JWT token
-                .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter
+                                .class)
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter
+                                .class);
 
         return http.build();
     }
